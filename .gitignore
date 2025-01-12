@@ -2,7 +2,8 @@
 *.o
 *.out
 *.exe
-
+Labyrinthgenerator
 #ignore logs and temporary files
 *.log
 *.tmp
+
