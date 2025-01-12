@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <time.h>
 
+
+
+
 int getSize(int *columns, int *rows) {
     printf("Bitte die Länge angeben \n");
     scanf("%d", columns);
@@ -11,10 +14,50 @@ int getSize(int *columns, int *rows) {
     return 0;
 }
 
+void pregenerateLabyrinth(int rows, int columns, int labyrinth[rows][columns]){
+ for(int i = 0; i < rows; i++){
+    for(int j = 0; j < columns; j++){
+        labyrinth[i][j] = 1111;
+    }
+ }
+}
+// 1 1 1 1 | 1 bedeutet Wand, 0 bedeutet keine Wand
+// N S W O |
+void removeWall(int rows, int columns, int labyrinth[rows][columns], int row, int column) {
+    int direction = rand() % 4;
+
+    switch (direction) {
+        case 0:  // Nordne
+            if (row > 0) {
+                labyrinth[row][column] &= 0b0111;        
+                labyrinth[row - 1][column] &= 0b1011;   
+            }
+            break;
+        case 1:  // Süden
+            if (row < rows - 1) {
+                labyrinth[row][column] &= 0b1011;        
+                labyrinth[row + 1][column] &= 0b0111;   
+            }
+            break;
+        case 2:  // Westen
+            if (column > 0) {
+                labyrinth[row][column] &= 0b1101;        
+                labyrinth[row][column - 1] &= 0b1110;   
+            }
+            break;
+        case 3:  // Osten
+            if (column < columns - 1) {
+                labyrinth[row][column] &= 0b1110;        
+                labyrinth[row][column + 1] &= 0b1101;   
+            }
+            break;
+    }
+}
+
 void saveArrayToTxt(int rows, int columns, int array[rows][columns], const char *filename) {
     FILE *file = fopen(filename, "w");
     if (file == NULL) {
-        printf("Error: Could not open File %s\n", filename);
+        printf("Error: Datei konnte nicht geöffnet werden %s\n", filename);
         return;
     }
     for (int i = 0; i < rows; i++) {
@@ -31,21 +74,16 @@ void saveArrayToTxt(int rows, int columns, int array[rows][columns], const char 
 
 int main() {
     int rows, columns;
-
-    getSize(&columns, &rows);
-
-    int Labyrinth[rows][columns];
-
     srand(time(NULL));
+    getSize(&columns, &rows);
+    int Labyrinth[rows][columns];
+    pregenerateLabyrinth(rows, columns, Labyrinth);
 
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < columns; j++) {
-            Labyrinth[i][j] = rand() % 2;
-        }
-    }
-
+    int startingcolumn = rand() % columns;
+    int startingrow = rand() % rows;
+    
     saveArrayToTxt(rows, columns, Labyrinth, "Labyrinth.txt");
 
-    printf("Labyrinth saved to Labyrinth.txt\n");
+    printf("Labyrinth saved in Labyrinth.txt\n");
     return 0;
 }
