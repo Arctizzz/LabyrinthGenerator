@@ -2,8 +2,102 @@
 #include <stdio.h>
 #include <time.h>
 
+struct Node {
+int row;
+int column;
+int visited;
+struct Node* next;
+};
+
+void addNode(struct Node** head, int row, int column) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->row = row;
+    newNode->column = column;
+    newNode->visited = 0;
+    newNode->next = NULL;
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        struct Node* temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+}
 
 
+struct Node* findNode(struct Node* head, int row, int column) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        if (temp->row == row && temp->column == column) {
+            return temp;  
+        }
+        temp = temp->next;  
+    }
+    return NULL;  
+}
+void printList(struct Node* head) {
+    struct Node* temp = head;
+    printf("Current Linked List:\n");
+    while (temp != NULL) {
+        printf("Node at (%d, %d)%d->", temp->row, temp->column,temp->visited);
+        temp = temp->next;
+    }
+    printf("End of List\n");
+}
+
+void addNeighbors(struct Node** head, int rows, int columns, int row, int column) {
+    if (row > 0 && findNode(*head, row - 1, column) == NULL) {
+        addNode(head, row - 1, column);
+        findNode(*head, row - 1, column)->visited = 1;  
+    }
+    if (row < rows - 1 && findNode(*head, row + 1, column) == NULL) {
+        addNode(head, row + 1, column);
+        findNode(*head, row + 1, column)->visited = 1;  
+    }
+    if (column > 0 && findNode(*head, row, column - 1) == NULL) {
+        addNode(head, row, column - 1);
+        findNode(*head, row, column - 1)->visited = 1;  
+    }
+    if (column < columns - 1 && findNode(*head, row, column + 1) == NULL) {
+        addNode(head, row, column + 1);
+        findNode(*head, row, column + 1)->visited = 1;  
+    }
+}
+
+struct Node* chooseRandom(struct Node* head, int currentRow, int currentColumn) {
+    int count = 0;
+    struct Node* temp = head;
+    while (temp != NULL) {
+        if (!temp->visited && 
+            ((temp->row == currentRow - 1 && temp->column == currentColumn) ||
+            (temp->row == currentRow + 1 && temp->column == currentColumn) ||
+            (temp->row == currentRow && temp->column == currentColumn - 1) ||
+            (temp->row == currentRow && temp->column == currentColumn+ 1))) {
+            count++;
+        }
+        temp = temp->next;
+    }
+    if (count == 0)
+        return NULL;
+
+    int randomIndex = rand() % count;
+    temp = head;
+    while (temp != NULL) {
+        if (!temp->visited && 
+            ((temp->row == currentRow - 1 && temp->column == currentColumn) ||
+            (temp->row == currentRow + 1 && temp->column == currentColumn) ||
+            (temp->row == currentRow && temp->column == currentColumn - 1) ||
+            (temp->row == currentRow && temp->column == currentColumn + 1))) {
+            if (randomIndex == 0)
+                return temp;
+            randomIndex--;
+        }
+        temp = temp->next;
+    }
+    return NULL;
+}
 
 int getSize(int *columns, int *rows) {
     printf("Bitte die Länge angeben \n");
@@ -74,16 +168,35 @@ void saveArrayToTxt(int rows, int columns, int array[rows][columns], const char 
 
 int main() {
     int rows, columns;
-    srand(time(NULL));
-    getSize(&columns, &rows);
-    int Labyrinth[rows][columns];
-    pregenerateLabyrinth(rows, columns, Labyrinth);
+    getSize(&columns, &rows);  
 
-    int startingcolumn = rand() % columns;
-    int startingrow = rand() % rows;
-    
+    int Labyrinth[rows][columns];  
+    struct Node* list = NULL;
+
+    srand(time(NULL));  
+
+    pregenerateLabyrinth(rows, columns, Labyrinth);  
+
+    int startingrow = rand() % rows;       
+    int startingcolumn = rand() % columns; 
+
+    addNode(&list, startingrow, startingcolumn);  
+    struct Node* current = list;
+    current->visited = 1;
+
+    while (current != NULL) {
+        addNeighbors(&list, rows+1, columns+1, current->row, current->column);
+        current = chooseRandom(list, current->row, current->column);
+
+
+        if (current != NULL) {
+            current->visited = 1;
+            printf("Expanded node at (%d, %d)\n", current->row, current->column);
+        }
+    }
+
     saveArrayToTxt(rows, columns, Labyrinth, "Labyrinth.txt");
-
+    printList(list);
     printf("Labyrinth saved in Labyrinth.txt\n");
     return 0;
 }
