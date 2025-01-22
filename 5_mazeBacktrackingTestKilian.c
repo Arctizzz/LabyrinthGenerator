@@ -6,7 +6,7 @@
 #define PATH 0  // Pfad wird als 0 dargestellt
 
 // Bewegungsrichtungen: Oben, Unten, Links, Rechts (jeweils 2 Felder weiter)
-const int directions[4][2] = {{0, -2}, {0, 2}, {-2, 0}, {2, 0}};
+const int richtungen[4][2] = {{0, -2}, {0, 2}, {-2, 0}, {2, 0}};
 
 // Funktion zum Zufälligen Mischen eines Arrays (Fisher-Yates Algorithmus)
 void shuffle(int *array, int size) {
@@ -25,12 +25,12 @@ void generateMaze(int **maze, int breite, int hoehe, int x, int y) {
     shuffle(order, 4);  // Zufällige Bewegungsrichtungen
 
     for (int i = 0; i < 4; i++) {
-        int nx = x + directions[order[i]][0];
-        int ny = y + directions[order[i]][1];
+        int nx = x + richtungen[order[i]][0];
+        int ny = y + richtungen[order[i]][1];
 
         // Prüfen, ob sich die neue Position innerhalb des Labyrinths befindet und noch nicht besucht wurde
         if (nx > 0 && ny > 0 && nx < breite - 1 && ny < hoehe - 1 && maze[ny][nx] == WALL) {
-            maze[y + directions[order[i]][1] / 2][x + directions[order[i]][0] / 2] = PATH;  // Verbindung öffnen
+            maze[y + richtungen[order[i]][1] / 2][x + richtungen[order[i]][0] / 2] = PATH;  // Verbindung öffnen
             generateMaze(maze, breite, hoehe, nx, ny);  // Rekursion zur weiteren Generierung
         }
     }
@@ -42,7 +42,11 @@ void printMaze(int **maze, int breite, int hoehe) {
     for (int i = 0; i < hoehe; i++) {
         printf("  ");
         for (int j = 0; j < breite; j++) {
-            printf(maze[i][j] == WALL ? "\u2588\u2588" : "  ");  // Wand: "██", Pfad: "  "
+            if (maze[i][j] == WALL) {
+                printf("\u2588\u2588");  // Wand: "██"
+            } else {
+                printf("  ");  // Pfad: "  "
+            }
         }
         printf("\n");
     }
