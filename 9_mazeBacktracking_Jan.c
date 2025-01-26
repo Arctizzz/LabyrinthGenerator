@@ -43,41 +43,41 @@ void generateMaze_Backtracking(int **maze, int breite, int hoehe, int x, int y) 
 
 // Prim's Algorithmus zur Labyrinth-Erstellung
 void generateMaze_Prims(int **maze, int breite, int hoehe) {
-    // Startpunkt setzen
+    // Startpunkt
     int startX = 1, startY = 1;
     maze[startY][startX] = PATH;
 
-    // Dynamische Liste für Wände
-    Wand *wände = (Wand *)malloc(breite * hoehe * sizeof(Wand));
-    int wändeAnzahl = 0;
+    // Liste mit besuchten Zellen (dynamisch wachsend)
+    Wand *frontier = (Wand *)malloc(breite * hoehe * sizeof(Wand));
+    int frontierCount = 0;
 
-    // Startwände zur Liste hinzufügen
+    // Startwände hinzufügen
     for (int i = 0; i < 4; i++) {
         int nx = startX + richtungen[i][0];
         int ny = startY + richtungen[i][1];
         if (nx > 0 && ny > 0 && nx < breite - 1 && ny < hoehe - 1) {
-            wände[wändeAnzahl++] = (Wand){nx, ny};
+            frontier[frontierCount++] = (Wand){nx, ny};
         }
     }
 
-    while (wändeAnzahl > 0) {
+    while (frontierCount > 0) {
         // Zufällige Wand wählen
-        int index = rand() % wändeAnzahl;
-        Wand wand = wände[index];
+        int index = rand() % frontierCount;
+        Wand wand = frontier[index];
 
-        // Prüfen, ob die Wand zu einem unbesuchten Bereich führt
-        int count = 0, px = 0, py = 0;
+        // Prüfen, ob genau eine Nachbarzelle bereits besucht wurde
+        int validNeighbors = 0, px = 0, py = 0;
         for (int i = 0; i < 4; i++) {
             int nx = wand.x + richtungen[i][0];
             int ny = wand.y + richtungen[i][1];
             if (nx > 0 && ny > 0 && nx < breite - 1 && ny < hoehe - 1 && maze[ny][nx] == PATH) {
-                count++;
+                validNeighbors++;
                 px = nx;
                 py = ny;
             }
         }
 
-        if (count == 1) {
+        if (validNeighbors == 1) {
             maze[wand.y][wand.x] = PATH;
             maze[(wand.y + py) / 2][(wand.x + px) / 2] = PATH;
 
@@ -86,16 +86,16 @@ void generateMaze_Prims(int **maze, int breite, int hoehe) {
                 int nx = wand.x + richtungen[i][0];
                 int ny = wand.y + richtungen[i][1];
                 if (nx > 0 && ny > 0 && nx < breite - 1 && ny < hoehe - 1 && maze[ny][nx] == WALL) {
-                    wände[wändeAnzahl++] = (Wand){nx, ny};
+                    frontier[frontierCount++] = (Wand){nx, ny};
                 }
             }
         }
 
-        // Entferne die Wand aus der Liste
-        wände[index] = wände[--wändeAnzahl];
+        // Entferne die Wand aus der Liste (ersetze durch letzte Wand)
+        frontier[index] = frontier[--frontierCount];
     }
 
-    free(wände);
+    free(frontier);
 }
 
 // Funktion zur Konsolenausgabe des Labyrinths
