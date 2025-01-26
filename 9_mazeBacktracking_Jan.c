@@ -145,7 +145,7 @@ void SaveMazeToFile(int **maze, int breite, int hoehe, char wandsymbol, char pfa
     printf("Labyrinth wurde in '%s' gespeichert.\n", filename);
 }
 
-// Funkion um ein Loesungsweg zu finden
+// Funkion um ein Loesungsweg zu finden (DFS)
 int SolveMaze(int **maze, int breite, int hoehe, int x, int y, int exitx, int exity){
 
     if (x == exitx && y == exity){
@@ -171,7 +171,7 @@ int SolveMaze(int **maze, int breite, int hoehe, int x, int y, int exitx, int ex
 
 }
 
-// Sackgassen zählen
+// Sackgassen und Anzahl der Wege zählen
 int CountDeadEnds(int **maze, int breite, int hoehe) {
     int deadends = 0;
     int pathAnzahl = 0;
@@ -252,7 +252,7 @@ int main() {
     maze[1][0] = PATH;
     maze[hoehe - 2][breite - 1] = PATH;
 
-    // Deadends zählen
+    // Deadends und Anzahl der Wege zählen
     int deadends = CountDeadEnds(maze, breite, hoehe);
 
     SolveMaze(maze, breite, hoehe, 0, 1, breite - 1, hoehe - 2);
@@ -260,14 +260,11 @@ int main() {
     // Labyrinth in der Konsole ausgeben
     printMaze(maze, breite, hoehe, wandSymbol, pfadSymbol);
 
-    
-
     printf("Soll die Loesunng geziegt werden? Schreib 1 fuer Ja und 2 fuer Nein: " );
     scanf("%d", &loesung);
 
     if (loesung == 1)
     {PrintMazesolution(maze, breite, hoehe, wandSymbol, pfadSymbol);}
-
 
     // Labyrinth in einer Datei speichern
     SaveMazeToFile(maze, breite, hoehe, wandSymbol, pfadSymbol, "labyrinth.txt");
