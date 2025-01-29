@@ -136,7 +136,7 @@ void SaveMazeToFile(int **maze, int breite, int hoehe, char wandsymbol, char pfa
 }
 
 // Funkion um ein Loesungsweg zu finden (DFS)
-int SolveMaze(int **maze, int breite, int hoehe, int x, int y, int exitx, int exity){
+int SolveMaze(int **maze, int breite, int hoehe, int x, int y, int exitx, int exity, int *langeStraße){
 
     if (x == exitx && y == exity){
 
@@ -146,17 +146,20 @@ int SolveMaze(int **maze, int breite, int hoehe, int x, int y, int exitx, int ex
 
     if (x < 0 || y < 0 || x >= breite || y >= hoehe || maze[y][x] != PATH) return 0;
 
-    maze[y][x] = 2; // Punkt als loesungsweg markiert
+    maze[y][x] = 2; // Punkt als loesungspfad markiert
+    (*langeStraße)++;
+    
 
-    if (SolveMaze(maze, breite, hoehe, x, y - 1, exitx, exity) ||   // oben
-        SolveMaze(maze, breite, hoehe, x, y + 1, exitx, exity) ||   // unten
-        SolveMaze(maze, breite, hoehe, x - 1, y, exitx, exity) ||   // links
-        SolveMaze(maze, breite, hoehe, x + 1, y, exitx, exity))     // rechts
+    if (SolveMaze(maze, breite, hoehe, x, y - 1, exitx, exity, langeStraße) ||   // oben
+        SolveMaze(maze, breite, hoehe, x, y + 1, exitx, exity, langeStraße) ||   // unten
+        SolveMaze(maze, breite, hoehe, x - 1, y, exitx, exity, langeStraße) ||   // links
+        SolveMaze(maze, breite, hoehe, x + 1, y, exitx, exity, langeStraße))     // rechts
         {
             return 1;
         }
     
     maze[y][x] = PATH;
+    (*langeStraße)--;
     return 0;
 
 }
@@ -201,6 +204,7 @@ int main() {
     int breite, hoehe;
     int algorithmus;
     int loesung;
+    int langeStraße = 0;
 
     printf("Breite des Labyrinths (ungerade Zahl) ein: ");
     scanf("%d", &breite);
@@ -245,7 +249,9 @@ int main() {
     // Deadends und Anzahl der Wege zählen
     int deadends = CountDeadEnds(maze, breite, hoehe);
 
-    SolveMaze(maze, breite, hoehe, 0, 1, breite - 1, hoehe - 2);
+    SolveMaze(maze, breite, hoehe, 0, 1, breite - 1, hoehe - 2, &langeStraße);
+
+    printf("Die Laenge des Loesungspfades: %d",langeStraße);
 
     // Labyrinth in der Konsole ausgeben
     printMaze(maze, breite, hoehe, wandSymbol, pfadSymbol);
