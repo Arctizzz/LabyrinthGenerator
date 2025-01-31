@@ -247,7 +247,7 @@ int main() {
     // Labyrinth in der Konsole ausgeben
     printMaze(maze, breite, hoehe);
 
-    printf("Soll die Loesunng geziegt werden? Schreib 1 fuer Ja und 2 fuer Nein: " );
+    printf("Soll die Loesung gezeigt werden? Schreib 1 fuer Ja und 2 fuer Nein: " );
     scanf("%d", &loesung);
 
     if (loesung == 1)
