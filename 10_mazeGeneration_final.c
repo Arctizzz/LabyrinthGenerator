@@ -89,7 +89,7 @@ void generateMaze_Prims(int **maze, int breite, int hoehe) {
     free(frontier);
 }
 
-// Funktion zur Konsolenausgabe des Labyrinths (angepasst an 9_mazeBacktrackingTestKilianClockPrimsAlgoOptimized.c)
+// Funktion zur Konsolenausgabe des Labyrinths
 void printMaze(int **maze, int breite, int hoehe) {
     printf("\n\n");
     for (int i = 0; i < hoehe; i++) {
@@ -126,7 +126,7 @@ void printMazeSolution(int **maze, int breite, int hoehe) {
 }
 
 // Funkion um ein Loesungsweg zu finden (DFS)
-int SolveMaze(int **maze, int breite, int hoehe, int x, int y, int exitx, int exity, int *langeStraße){
+int solveMaze(int **maze, int breite, int hoehe, int x, int y, int exitx, int exity, int *langeStraße){
 
     if (x == exitx && y == exity){
 
@@ -140,10 +140,10 @@ int SolveMaze(int **maze, int breite, int hoehe, int x, int y, int exitx, int ex
     (*langeStraße)++;
     
 
-    if (SolveMaze(maze, breite, hoehe, x, y - 1, exitx, exity, langeStraße) ||   // oben
-        SolveMaze(maze, breite, hoehe, x, y + 1, exitx, exity, langeStraße) ||   // unten
-        SolveMaze(maze, breite, hoehe, x - 1, y, exitx, exity, langeStraße) ||   // links
-        SolveMaze(maze, breite, hoehe, x + 1, y, exitx, exity, langeStraße))     // rechts
+    if (solveMaze(maze, breite, hoehe, x, y - 1, exitx, exity, langeStraße) ||   // oben
+        solveMaze(maze, breite, hoehe, x, y + 1, exitx, exity, langeStraße) ||   // unten
+        solveMaze(maze, breite, hoehe, x - 1, y, exitx, exity, langeStraße) ||   // links
+        solveMaze(maze, breite, hoehe, x + 1, y, exitx, exity, langeStraße))     // rechts
         {
             return 1;
         }
@@ -155,7 +155,7 @@ int SolveMaze(int **maze, int breite, int hoehe, int x, int y, int exitx, int ex
 }
 
 // Sackgassen und Anzahl der Wege zählen
-int CountDeadEnds(int **maze, int breite, int hoehe) {
+int countDeadEnds(int **maze, int breite, int hoehe) {
     int deadends = 0;
     int pathAnzahl = 0;
 
@@ -170,11 +170,11 @@ int CountDeadEnds(int **maze, int breite, int hoehe) {
                 if (maze[y][x - 1] == PATH) offeneNachbarn++;  // Links
                 if (maze[y][x + 1] == PATH) offeneNachbarn++;  // Rechts
 
-                //printf("Feld (%d, %d): Offene Nachbarn = %d\n", x, y, offeneNachbarn); hatte probleme
+                //printf("Feld (%d, %d): Offene Nachbarn = %d\n", x, y, offeneNachbarn); Fehleranalyse
 
                 // Wenn genau 1 offener Nachbar (Dead End), zähle es
                 if (offeneNachbarn == 1){
-                    //printf("-> Dead End gefunden bei (%d, %d)\n", x, y); hatte probleme
+                    //printf("-> Dead End gefunden bei (%d, %d)\n", x, y); Fehleranalyse
                     deadends++; 
                 }
                 pathAnzahl++;
@@ -238,9 +238,9 @@ int main() {
     maze[hoehe - 2][breite - 1] = PATH;
 
     // Deadends und Anzahl der Wege zählen
-    int deadends = CountDeadEnds(maze, breite, hoehe);
+    int deadends = countDeadEnds(maze, breite, hoehe);
 
-    SolveMaze(maze, breite, hoehe, 0, 1, breite - 1, hoehe - 2, &langeStraße);
+    solveMaze(maze, breite, hoehe, 0, 1, breite - 1, hoehe - 2, &langeStraße);
 
     printf("Die Laenge des Loesungspfades: %d",langeStraße);
 
